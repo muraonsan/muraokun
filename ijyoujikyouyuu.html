@@ -1,276 +1,269 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Muraon Mobile Tools</title>
-
-  <!-- 既存のアイコン指定（GitHub Pages サブパス対応） -->
-  <link rel="icon" href="favicon.ico" type="image/x-icon">
-  <link rel="apple-touch-icon" sizes="180x180" href="/muraokun/apple-touch-icon.png">
-  <link rel="apple-touch-icon" sizes="167x167" href="/muraokun/apple-touch-icon-167x167.png">
-  <link rel="apple-touch-icon" sizes="152x152" href="/muraokun/apple-touch-icon-152x152.png">
-  <link rel="apple-touch-icon" sizes="120x120" href="/muraokun/apple-touch-icon-120x120.png">
-
-  <link rel="stylesheet" href="styles.css">
-
-  <!-- ページ内で使う最小限の追加スタイル（既存cssの邪魔をしないプレフィックス） -->
-  <style>
-    .upapp-wrap{max-width:900px;margin:0 auto;padding:16px}
-    .upapp-card{background:#adbcff;border:1px solid #cf91cf;border-radius:14px;padding:14px;margin:14px 0;box-shadow:0 6px 18px rgba(0, 0, 0, 0.15)}
-    .upapp-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    .upapp-actions{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-    .upapp-pill{font-size:12px;color:#cbd5e1;background:#3b4236;border:1px dashed #2a3550;border-radius:999px;padding:4px 10px;display:inline-flex;gap:6px;align-items:center}
-    .upapp-posts{display:grid;gap:12px}
-    .upapp-post{display:grid;gap:10px}
-    .upapp-post img{width:100%;height:auto;border-radius:12px;border:1px solid #262933;background:rgb(0, 0, 0)}
-    .upapp-danger{background:#ef4444;color:#fff;border:0;padding:10px 12px;border-radius:12px;cursor:pointer}
-    .upapp-btn{cursor:pointer;background:#1a2133;color:#e9eef2;border:1px solid #2a3550;padding:10px 12px;border-radius:12px}
-    .upapp-primary{background:#89b4fa;color:#000000;border:0;font-weight:700}
-    .upapp-input, .upapp-file{width:100%;padding:8px 3px;border-radius:12px;border:1px solid #262933;background:#968fff;color:#e9eef2}
-    .upapp-hint{font-size:13px;color:#000000;margin-top:6px}
-    .upapp-right{margin-left:auto}
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Muraon Mobile Tools</title>
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" sizes="180x180" href="/muraokun/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="167x167" href="/muraokun/apple-touch-icon-167x167.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/muraokun/apple-touch-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="/muraokun/apple-touch-icon-120x120.png">
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+      body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:#0b0c10;color:#e9eef2}
+      .wrap{max-width:900px;margin:0 auto;padding:20px}
+      .card{background:#121318;border:1px solid #1e2027;border-radius:16px;padding:16px;margin-bottom:16px;box-shadow:0 6px 18px rgba(0,0,0,.2)}
+      label{display:block;margin:8px 0 4px;color:#9aa3ad}
+      input,button{width:100%;padding:10px 12px;border-radius:12px;border:1px solid #262933;background:#0f1115;color:#e9eef2}
+      button{cursor:pointer;background:#1a2133;border:1px solid #2a3550}
+      button.primary{background:#89b4fa;color:#0b0c10;font-weight:700;border:0}
+      .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+      .actions{display:flex;gap:12px}
+      .pill{font-size:12px;color:#cbd5e1;background:#0f1115;border:1px dashed #2a3550;border-radius:999px;padding:4px 10px;display:inline-flex;gap:8px;align-items:center}
+      .posts{display:grid;gap:12px}
+      .post img{width:100%;border-radius:12px;border:1px solid #262933;background:#0f1115}
+      .danger{background:#ef4444;color:white;border:0}
+      .right{margin-left:auto}
+      .hint{font-size:13px;color:#94a3b8}
+    </style>
 </head>
 <body>
-  <!-- 既存ナビ -->
-  <div class="navbar">
-    <div class="site-title">
-      Muraon Mobile Tools &nbsp;&nbsp;&nbsp;
-      <button class="btn-orange" onclick="location.reload();">更新</button>
-      <button class="btn-yellow" onclick="history.back();">戻る</button>
+    <div class="navbar">
+        <div class="site-title">Muraon Mobile Tools &nbsp;&nbsp;&nbsp;<button class="btn-orange" onclick="location.reload();">更新</button> 
+        <button class="btn-yellow" onclick="history.back();">戻る</button></div>
+        <div class="clock" id="clock"></div>
     </div>
-    <div class="clock" id="clock"></div>
-  </div>
 
-  <br><br><br>
-  <h2>&nbsp;&nbsp;&nbsp;&nbsp;MURAON Mobile Tool WEB</h2>
+    <br><br><br>
+    <h2 style="padding-left:20px;">MURAON Mobile Tool WEB</h2>
 
-  <!-- 画像投稿ミニアプリ（埋め込み） -->
-  <div class="upapp-wrap">
-    <!-- 投稿フォーム -->
-    <div class="upapp-card">
-      <div class="upapp-row">
-        <div>
-          <label>画像を選択（カメラ撮影も可）</label>
-          <input id="upapp-file" class="upapp-file" type="file" accept="image/*" capture="environment">
-          <div class="upapp-hint">※iPad/Safariでカメラを使うにはサイトへのカメラ許可が必要です。</div>
-        </div>
-        <div>
-          <label>投稿メモ（任意）</label>
-          <input id="upapp-note" class="upapp-input" type="text" placeholder="ひとことメモ">
-        </div>
-      </div>
-
-      <div class="upapp-row" style="margin-top:12px">
-        <div>
-          <label>撮影場所（GPS）</label>
-          <div class="upapp-actions">
-            <button id="upapp-getgps" class="upapp-btn" type="button">現在地を取得</button>
-            <span id="upapp-gpsstatus" class="upapp-pill">未取得</span>
+    <div class="wrap">
+      <div class="card">
+        <div class="row">
+          <div>
+            <label>画像を選択（カメラ撮影も可）</label>
+            <input id="file" type="file" accept="image/*" capture="environment">
+            <div class="hint">※カメラ利用には許可が必要</div>
+          </div>
+          <div>
+            <label>投稿メモ（任意）</label>
+            <input id="note" type="text" placeholder="ひとことメモ">
           </div>
         </div>
-        <div>
-          <label>撮影日時</label>
-          <input id="upapp-takenat" class="upapp-input" type="datetime-local">
-          <div class="upapp-hint">空のままなら投稿時刻を保存します（秒まで）。</div>
-        </div>
-      </div>
-
-      <div class="upapp-actions" style="margin-top:12px">
-        <button id="upapp-upload" class="upapp-btn upapp-primary" type="button">アップロード</button>
-        <button id="upapp-sign" class="upapp-btn upapp-right" type="button">ログイン/メール認証</button>
-      </div>
-      <div id="upapp-msg" class="upapp-hint" style="margin-top:8px"></div>
-    </div>
-
-    <!-- 一覧 -->
-    <div class="upapp-card">
-      <div class="upapp-actions" style="justify-content:space-between">
-        <strong>投稿一覧</strong>
-        <button id="upapp-refresh" class="upapp-btn" type="button">再読み込み</button>
-      </div>
-      <div id="upapp-posts" class="upapp-posts"></div>
-    </div>
-  </div>
-
-  <!-- 既存フッター -->
-  <div class="footer">
-    &copy; 2025 MURAON WEB. All rights reserved.
-  </div>
-
-  <!-- 既存：時計 -->
-  <script>
-    function updateClock() {
-      const now = new Date();
-      const h = String(now.getHours()).padStart(2,'0');
-      const m = String(now.getMinutes()).padStart(2,'0');
-      const s = String(now.getSeconds()).padStart(2,'0');
-      document.getElementById('clock').textContent = `${h}:${m}:${s}`;
-    }
-    setInterval(updateClock, 1000);
-    updateClock();
-  </script>
-
-  <!-- Supabase JS CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-  <!-- 画像投稿ミニアプリのロジック（ID衝突しないよう upapp- プレフィックス） -->
-  <script>
-    // ====== ここを書き換えて使ってください ======
-    const SUPABASE_URL = "https://hfjdohkaowzsvzmndpsp.supabase.co"; // 例: https://abcxyz.supabase.co
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhmamRvaGthb3d6c3Z6bW5kcHNwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY3ODU4MDcsImV4cCI6MjA3MjM2MTgwN30.G3tfeNkMd4v5_uWkJEFBWwMSy-aDZAxjFlK2tSha1Gs"; // Supabaseの anon 公開キー
-    const STORAGE_BUCKET = "images"; // 先にコンソールで作成しておく（Publicが手軽）
-    // ==============================================
-
-    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-    const $ = (id)=>document.getElementById(id);
-    const els = {
-      file: $('upapp-file'),
-      note: $('upapp-note'),
-      takenAt: $('upapp-takenat'),
-      getGpsBtn: $('upapp-getgps'),
-      gpsStatus: $('upapp-gpsstatus'),
-      uploadBtn: $('upapp-upload'),
-      signBtn: $('upapp-sign'),
-      msg: $('upapp-msg'),
-      posts: $('upapp-posts'),
-      refreshBtn: $('upapp-refresh'),
-    };
-
-    let coords = null; // {lat, lng}
-    function notify(t){ els.msg.textContent = t; }
-
-    // GPS
-    els.getGpsBtn.addEventListener('click', () => {
-      if (!('geolocation' in navigator)) { notify('このブラウザは位置情報に対応していません'); return; }
-      notify('位置情報を取得中…');
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          coords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-          els.gpsStatus.textContent = `取得済: ${coords.lat.toFixed(5)}, ${coords.lng.toFixed(5)}`;
-          notify('位置情報を取得しました');
-        },
-        (err) => {
-          console.error(err);
-          notify('位置情報の取得に失敗しました（設定を確認してください）');
-        },
-        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-      );
-    });
-
-    // アップロード前に縮小（最大辺1600px・JPEG）
-    async function downscaleImage(file, maxSize = 1600) {
-      const bmp = await createImageBitmap(file);
-      const ratio = Math.max(bmp.width, bmp.height) > maxSize ? maxSize / Math.max(bmp.width, bmp.height) : 1;
-      const canvas = document.createElement('canvas');
-      canvas.width = Math.round(bmp.width * ratio);
-      canvas.height = Math.round(bmp.height * ratio);
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(bmp, 0, 0, canvas.width, canvas.height);
-      const blob = await new Promise(res => canvas.toBlob(res, 'image/jpeg', 0.9));
-      return new File([blob], file.name.replace(/\.[^.]+$/,'') + '.jpg', { type: 'image/jpeg' });
-    }
-
-    // 認証（メールリンク）
-    els.signBtn.addEventListener('click', async () => {
-      const email = prompt('ログイン用メールアドレスを入力してください（マジックリンクを送ります）');
-      if(!email) return;
-      const { error } = await sb.auth.signInWithOtp({ email, options: { emailRedirectTo: location.href } });
-      if(error) notify('メール送信に失敗: ' + error.message);
-      else notify('メールを送信しました。受信トレイを確認してください。');
-    });
-
-    // 投稿
-    els.uploadBtn.addEventListener('click', async () => {
-      try{
-        const user = (await sb.auth.getUser()).data.user;
-        if (!user) { notify('投稿にはログインが必要です（右のボタンからメール認証してください）'); return; }
-        const file = els.file.files[0];
-        if (!file) { notify('画像ファイルを選択してください'); return; }
-
-        notify('画像処理中…');
-        const compressed = await downscaleImage(file);
-
-        const uuid = crypto.randomUUID();
-        const path = `${user.id}/${uuid}.jpg`;
-
-        notify('アップロード中…');
-        const { error: upErr } = await sb.storage.from(STORAGE_BUCKET).upload(path, compressed, { cacheControl: '3600', upsert: false });
-        if (upErr) throw upErr;
-
-        const { data: { publicUrl } } = sb.storage.from(STORAGE_BUCKET).getPublicUrl(path);
-
-        const createdAt = new Date().toISOString();
-        const takenAt = els.takenAt.value ? new Date(els.takenAt.value).toISOString() : createdAt;
-
-        const { error: insErr } = await sb.from('posts').insert({
-          user_id: user.id,
-          image_path: path,
-          image_url: publicUrl,
-          note: els.note.value || null,
-          created_at: createdAt,
-          taken_at: takenAt,
-          lat: coords?.lat ?? null,
-          lng: coords?.lng ?? null,
-        });
-        if (insErr) throw insErr;
-
-        notify('投稿しました');
-        els.file.value = '';
-        els.note.value = '';
-        els.takenAt.value = '';
-        coords = null; els.gpsStatus.textContent = '未取得';
-        await loadPosts();
-      }catch(e){
-        console.error(e); notify('投稿エラー: ' + e.message);
-      }
-    });
-
-    // 一覧
-    async function loadPosts(){
-      const { data: posts, error } = await sb.from('posts').select('*').order('created_at', { ascending: false }).limit(50);
-      if (error) { notify('読み込みエラー: ' + error.message); return; }
-      els.posts.innerHTML = '';
-      for (const p of posts){
-        const div = document.createElement('div');
-        div.className = 'upapp-post upapp-card';
-        const dt = new Date(p.created_at);
-        const dt2 = p.taken_at ? new Date(p.taken_at) : null;
-        div.innerHTML = `
-          <img src="${p.image_url}" alt="image" loading="lazy">
-          <div class="upapp-actions" style="gap:10px;flex-wrap:wrap">
-            <span class="upapp-pill">投稿: ${dt.toLocaleString()}</span>
-            ${dt2 ? `<span class="upapp-pill">撮影: ${dt2.toLocaleString()}</span>` : ''}
-            ${p.lat && p.lng ? `<span class="upapp-pill">GPS: ${Number(p.lat).toFixed(5)}, ${Number(p.lng).toFixed(5)}</span>` : ''}
-            ${p.note ? `<span class="upapp-pill">${p.note}</span>` : ''}
-            <span style="flex:1 1 auto"></span>
-            <button class="upapp-danger" data-id="${p.id}" data-path="${p.image_path}">削除</button>
+        <div class="row">
+          <div>
+            <label>撮影場所（GPS）</label>
+            <div class="actions">
+              <button id="getGpsBtn" type="button">現在地を取得</button>
+              <span id="gpsStatus" class="pill">未取得</span>
+            </div>
           </div>
-        `;
-        els.posts.appendChild(div);
-      }
-      // 削除
-      els.posts.querySelectorAll('button.upapp-danger').forEach(btn => {
-        btn.addEventListener('click', async () => {
-          if (!confirm('この投稿を削除しますか？')) return;
-          const id = btn.getAttribute('data-id');
-          const path = btn.getAttribute('data-path');
-          const user = (await sb.auth.getUser()).data.user;
-          if (!user) { notify('削除にはログインが必要です'); return; }
-          const { error: delErr } = await sb.from('posts').delete().eq('id', id);
-          if (delErr) { notify('削除エラー: ' + delErr.message); return; }
-          const { error: stErr } = await sb.storage.from(STORAGE_BUCKET).remove([path]);
-          if (stErr) { notify('画像削除エラー: ' + stErr.message); return; }
-          notify('削除しました');
-          await loadPosts();
+          <div>
+            <label>撮影日時</label>
+            <input id="takenAt" type="datetime-local">
+            <div class="hint">空のままなら投稿時刻を保存</div>
+          </div>
+        </div>
+        <div class="row" style="margin-top:12px">
+          <div>
+            <label>パスキー</label>
+            <input id="passkey" type="password" placeholder="パスキーを入力">
+            <div class="actions" style="margin-top:8px">
+              <button id="savePasskey" type="button">この端末に保存</button>
+              <span class="hint">※ログインは不要。正しいパスキー入力者のみ投稿・削除できます。</span>
+            </div>
+          </div>
+          <div></div>
+        </div>
+        <div class="actions" style="margin-top:12px">
+          <button id="uploadBtn" class="primary" type="button">アップロード</button>
+        </div>
+        <div id="msg" class="hint" style="margin-top:8px"></div>
+      </div>
+
+      <div class="card">
+        <div class="actions" style="justify-content:space-between;align-items:center">
+          <strong>投稿一覧</strong>
+          <button id="refreshBtn" type="button">再読み込み</button>
+        </div>
+        <div id="posts" class="posts"></div>
+      </div>
+    </div>
+
+    <div class="footer">&copy; 2025 MURAON WEB. All rights reserved.</div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+      // ===== 設定 =====
+      var SUPABASE_URL = "https://hfjdohkaowzsvzmndpsp.supabase.co";
+      var SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhmamRvaGthb3d6c3Z6bW5kcHNwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY3ODU4MDcsImV4cCI6MjA3MjM2MTgwN30.G3tfeNkMd4v5_uWkJEFBWwMSy-aDZAxjFlK2tSha1Gs";
+      var STORAGE_BUCKET = "images";
+      var PASSKEY = "12345"; // ← ここを任意のパスキーに
+
+      // ===== 準備 =====
+      var sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      var coords = null;
+      function $(id){ return document.getElementById(id); }
+      var els = {
+        file: $('file'), note: $('note'), takenAt: $('takenAt'),
+        getGpsBtn: $('getGpsBtn'), gpsStatus: $('gpsStatus'),
+        uploadBtn: $('uploadBtn'), msg: $('msg'), posts: $('posts'), refreshBtn: $('refreshBtn'),
+        passkey: $('passkey'), savePasskey: $('savePasskey')
+      };
+      function notify(t){ els.msg.textContent = t; }
+      function getPasskey(){ var p = localStorage.getItem('passkey') || (els.passkey && els.passkey.value) || ''; return (p+'').trim(); }
+
+      // ===== ユーティリティ =====
+      // 画像縮小（互換重視・ES5）: Blobとファイル名を返す
+      function downscaleImage(file, max){
+        if (typeof max === 'undefined') max = 1600;
+        return new Promise(function(resolve, reject){
+          try {
+            var url = URL.createObjectURL(file);
+            var img = new Image();
+            img.onload = function(){
+              try{
+                var w = img.naturalWidth || img.width;
+                var h = img.naturalHeight || img.height;
+                var ratio = Math.max(w, h) > max ? max / Math.max(w, h) : 1;
+                var cw = Math.round(w * ratio), ch = Math.round(h * ratio);
+                var canvas = document.createElement('canvas');
+                canvas.width = cw; canvas.height = ch;
+                var ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, cw, ch);
+                canvas.toBlob(function(blob){
+                  try{ URL.revokeObjectURL(url); }catch(e){}
+                  if(!blob){ return reject(new Error('toBlob failed')); }
+                  var name = (file.name || 'upload').replace(/\.[^.]+$/, '') + '.jpg';
+                  resolve({ blob: blob, name: name });
+                }, 'image/jpeg', 0.9);
+              }catch(err){ reject(err); }
+            };
+            img.onerror = function(e){ try{ URL.revokeObjectURL(url); }catch(_){}; reject(new Error('image load error')); };
+            img.src = url;
+          } catch (e) { reject(e); }
         });
+      }
+
+      // ===== イベント =====
+      if (els.savePasskey) {
+        els.savePasskey.onclick = function(){ localStorage.setItem('passkey', els.passkey ? (els.passkey.value||'') : ''); notify('パスキーを保存しました'); };
+      }
+
+      if (els.getGpsBtn) {
+        els.getGpsBtn.onclick = function(){
+          if (!('geolocation' in navigator)) { notify('位置情報非対応'); return; }
+          notify('取得中…');
+          navigator.geolocation.getCurrentPosition(function(p){
+            coords = { lat: p.coords.latitude, lng: p.coords.longitude };
+            els.gpsStatus.textContent = '取得済み: ' + coords.lat.toFixed(5) + ', ' + coords.lng.toFixed(5);
+            notify('位置情報OK');
+          }, function(err){ notify('失敗: ' + err.message); }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 });
+        };
+      }
+
+      if (els.uploadBtn) {
+        els.uploadBtn.onclick = function(){
+          try{
+            var file = els.file && els.file.files && els.file.files[0];
+            if(!file){ notify('画像を選択'); return; }
+            var input = getPasskey();
+            if(!input){ notify('パスキーを入力'); return; }
+            if(input !== PASSKEY){ notify('パスキーが違います'); return; }
+
+            notify('画像処理中…');
+            downscaleImage(file, 1600).then(function(res){
+              var uuid = (crypto && crypto.randomUUID) ? crypto.randomUUID() : (Date.now().toString(36) + Math.random().toString(36).slice(2));
+              var path = 'guest/' + uuid + '.jpg';
+
+              notify('アップロード中…');
+              return sb.storage.from(STORAGE_BUCKET).upload(path, res.blob, { cacheControl: '3600', upsert: false, contentType: 'image/jpeg' })
+              .then(function(up){
+                if (up.error) { throw up.error; }
+                var publicUrl = sb.storage.from(STORAGE_BUCKET).getPublicUrl(path).data.publicUrl;
+                var createdAt = new Date().toISOString();
+                var takenAt = els.takenAt && els.takenAt.value ? new Date(els.takenAt.value).toISOString() : createdAt;
+                return sb.from('posts').insert({
+                  user_id: null,
+                  image_path: path,
+                  image_url: publicUrl,
+                  note: els.note && els.note.value ? els.note.value : null,
+                  created_at: createdAt,
+                  taken_at: takenAt,
+                  lat: coords && coords.lat != null ? coords.lat : null,
+                  lng: coords && coords.lng != null ? coords.lng : null
+                });
+              }).then(function(ins){
+                if (ins.error) { throw ins.error; }
+                notify('投稿しました');
+                if (els.file) els.file.value = '';
+                if (els.note) els.note.value = '';
+                if (els.takenAt) els.takenAt.value = '';
+                coords = null; if (els.gpsStatus) els.gpsStatus.textContent = '未取得';
+                loadPosts();
+              }).catch(function(e){ notify('エラー: ' + (e.message || e)); });
+            }).catch(function(e){ notify('エラー: ' + (e.message || e)); });
+          }catch(e){ notify('エラー: ' + (e.message || e)); }
+        };
+      }
+
+      function buildList(posts){
+        els.posts.innerHTML = '';
+        for (var i=0; i<posts.length; i++){
+          var p = posts[i];
+          var card = document.createElement('div'); card.className = 'post card';
+
+          var img = document.createElement('img'); img.src = p.image_url; img.alt = 'image'; img.loading = 'lazy'; card.appendChild(img);
+
+          var meta = document.createElement('div'); meta.className = 'meta';
+          if (p.created_at){ var pill1 = document.createElement('span'); pill1.className='pill'; pill1.textContent = '投稿: ' + new Date(p.created_at).toLocaleString(); meta.appendChild(pill1); }
+          if (p.taken_at){ var pill2 = document.createElement('span'); pill2.className='pill'; pill2.textContent = '撮影: ' + new Date(p.taken_at).toLocaleString(); meta.appendChild(pill2); }
+          if (p.lat!=null && p.lng!=null){ var pill3=document.createElement('span'); pill3.className='pill'; pill3.textContent='GPS: ' + Number(p.lat).toFixed(5)+', '+Number(p.lng).toFixed(5); meta.appendChild(pill3); }
+          if (p.note){ var pill4=document.createElement('span'); pill4.className='pill'; pill4.textContent=p.note; meta.appendChild(pill4); }
+          var spacer = document.createElement('span'); spacer.className = 'right'; meta.appendChild(spacer);
+          var del = document.createElement('button'); del.className='danger'; del.textContent='削除'; del.setAttribute('data-id', p.id); del.setAttribute('data-path', p.image_path); meta.appendChild(del);
+          card.appendChild(meta); els.posts.appendChild(card);
+        }
+        var buttons = els.posts.querySelectorAll('button.danger');
+        for (var j=0; j<buttons.length; j++){
+          buttons[j].onclick = function(){
+            if(!confirm('削除?')) return;
+            var input = getPasskey(); if(!input){ notify('パスキーを入力'); return; }
+            if(input !== PASSKEY){ notify('パスキーが違います'); return; }
+            var id = this.getAttribute('data-id'); var path = this.getAttribute('data-path');
+            sb.from('posts').delete().eq('id', id).then(function(res){
+              if(res.error){ notify('削除エラー: ' + res.error.message); return; }
+              sb.storage.from(STORAGE_BUCKET).remove([path]).then(function(r2){ if(r2.error){ notify('画像削除エラー: ' + r2.error.message); }
+                notify('削除しました'); loadPosts(); });
+            });
+          };
+        }
+      }
+
+      function loadPosts(){
+        sb.from('posts').select('*').order('created_at', { ascending: false }).limit(50).then(function(res){
+          if(res.error){ notify('読み込み失敗: ' + res.error.message); return; }
+          buildList(res.data||[]);
+        });
+      }
+
+      if (els.refreshBtn) els.refreshBtn.onclick = loadPosts;
+      loadPosts();
+
+      function updateClock(){
+        var now = new Date();
+        var h = (''+now.getHours()).padStart(2,'0');
+        var m = (''+now.getMinutes()).padStart(2,'0');
+        var s = (''+now.getSeconds()).padStart(2,'0');
+        var clk = document.getElementById('clock'); if (clk) clk.textContent = h+':'+m+':'+s;
+      }
+      setInterval(updateClock, 1000); updateClock();
+
+      // 画面下部にエラー表示
+      window.addEventListener('error', function(e){
+        try { notify('JSエラー: ' + (e.message || (e.error && e.error.message) || 'unknown')); } catch(_) {}
       });
-    }
-
-    $('upapp-refresh').addEventListener('click', loadPosts);
-    (async ()=>{ await loadPosts(); })();
-  </script>
+    </script>
 </body>
 </html>
