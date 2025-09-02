@@ -9,7 +9,7 @@
     <link rel="apple-touch-icon" sizes="167x167" href="/muraokun/apple-touch-icon-167x167.png">
     <link rel="apple-touch-icon" sizes="152x152" href="/muraokun/apple-touch-icon-152x152.png">
     <link rel="apple-touch-icon" sizes="120x120" href="/muraokun/apple-touch-icon-120x120.png">
-    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="styles.css">
     <style>
       body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:#0b0c10;color:#e9eef2}
       .wrap{max-width:900px;margin:0 auto;padding:20px}
@@ -37,7 +37,7 @@
     </div>
 
     <br><br><br>
-    <h2 style="padding-left:20px;">MURAON Mobile Tool WEB</h2>
+    <h2 style="padding-left:20px;">異常時画像等情報共有システム</h2>
 
     <div class="wrap">
       <div class="card">
@@ -47,11 +47,13 @@
             <input id="file" type="file" accept="image/*" capture="environment">
             <div class="hint">※カメラ利用には許可が必要</div>
           </div>
+          &nbsp;
           <div>
             <label>投稿メモ（任意）</label>
             <input id="note" type="text" placeholder="ひとことメモ">
           </div>
         </div>
+        &nbsp;&nbsp;
         <div class="row">
           <div>
             <label>撮影場所（GPS）</label>
@@ -60,6 +62,7 @@
               <span id="gpsStatus" class="pill">未取得</span>
             </div>
           </div>
+          &nbsp;
           <div>
             <label>撮影日時</label>
             <input id="takenAt" type="datetime-local">
@@ -68,11 +71,11 @@
         </div>
         <div class="row" style="margin-top:12px">
           <div>
-            <label>パスキー</label>
+            <label>パスキー認証</label>
             <input id="passkey" type="password" placeholder="パスキーを入力">
             <div class="actions" style="margin-top:8px">
               <button id="savePasskey" type="button">この端末に保存</button>
-              <span class="hint">※ログインは不要。正しいパスキー入力者のみ投稿・削除できます。</span>
+              <span class="hint">※システムの各機能使用にはパスキー認証必須</span>
             </div>
           </div>
           <div></div>
