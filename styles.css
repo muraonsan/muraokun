@@ -63,6 +63,20 @@ body {
       background: darkorange; /* 押したときだけ濃くなる */
     }
 
+.btn-yellow {
+      padding: 3px 10px;
+      font-size: 14px;
+      color: #000000;
+      background: rgb(251, 255, 0);
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .btn-orange:active {
+      background: darkkhaki; /* 押したときだけ濃くなる */
+    }
+
     /* 上詰め 左寄せ */
 .top-left {
   display: flex;
