@@ -86,3 +86,45 @@ body {
   align-items: flex-start;     /* 縦：上詰め */
   height: 100%;
 }
+
+.btn-green {
+      padding: 6px 20px;
+      font-size: 18px;
+      color: #fff;
+      background: green;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .btn-green:active {
+      background: darkgreen; /* 押したときだけ濃くなる */
+    }
+
+.btn-red {
+      padding: 6px 20px;
+      font-size: 18px;
+      color: #fff;
+      background: red;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .btn-red:active {
+      background: darkred; /* 押したときだけ濃くなる */
+    }
+
+.btn-blue {
+      padding: 6px 20px;
+      font-size: 18px;
+      color: #fff;
+      background: blue;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .btn-blue:active {
+      background: darkblue; /* 押したときだけ濃くなる */
+    }
