@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Muraon Mobile Tools</title>
+  <link rel="icon" href="favicon.ico" type="image/x-icon" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/muraokun/apple-touch-icon.png" />
+  <link rel="apple-touch-icon" sizes="167x167" href="/muraokun/apple-touch-icon-167x167.png" />
+  <link rel="apple-touch-icon" sizes="152x152" href="/muraokun/apple-touch-icon-152x152.png" />
+  <link rel="apple-touch-icon" sizes="120x120" href="/muraokun/apple-touch-icon-120x120.png" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* --- Converter Card (scoped) --- */
+    #aac-app { --pri:#2563eb; --mut:#64748b; --bd:#e5e7eb; --chip:#eef2ff; --chipfg:#3730a3; }
+    #aac-app .card{background:#fff;border:1px solid var(--bd);border-radius:16px;box-shadow:0 10px 25px rgba(2,6,23,.06);padding:16px}
+    #aac-app .h1{font-size:clamp(18px,3.2vw,22px);margin:0 0 6px}
+    #aac-app .p{color:var(--mut);margin:0 0 10px}
+    #aac-app .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:10px}
+    #aac-app .btn{appearance:none;border:0;border-radius:12px;background:var(--pri);color:#fff;padding:10px 14px;font-weight:700;cursor:pointer}
+    #aac-app .btn[disabled]{opacity:.55;cursor:not-allowed}
+    #aac-app .ghost{background:#11182710;color:#111827}
+    #aac-app .input{padding:10px 12px;border:1px solid var(--bd);border-radius:12px;background:#fff}
+    #aac-app .drop{border:2px dashed #cbd5e1;border-radius:16px;padding:22px;text-align:center;color:#475569;background:#f1f5f9}
+    #aac-app .drop.drag{background:#e2e8f0}
+    #aac-app .prog{height:8px;background:#e5e7eb;border-radius:10px;overflow:hidden;margin-top:10px}
+    #aac-app .bar{height:100%;width:0;background:linear-gradient(90deg,#60a5fa,#2563eb)}
+    #aac-app .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace}
+    #aac-app .filetag{display:inline-block;background:var(--chip);color:var(--chipfg);border-radius:999px;padding:6px 10px;margin-top:6px}
+    #aac-app footer{margin-top:10px;color:#64748b;font-size:12px}
+    /* layout helper to sit nicely under existing .content */
+    .tools-grid{display:grid;grid-template-columns:1fr;gap:16px}
+    @media (min-width:900px){ .tools-grid{grid-template-columns:1fr 1fr} }
+  </style>
+</head>
+<body>
+  <div class="navbar">
+    <div class="site-title">
+      Muraon Mobile Tools &nbsp;&nbsp;&nbsp;<button class="btn-orange" onclick="location.reload();">更新</button>
+      <button class="btn-yellow" onclick="history.back();">戻る</button>
+    </div>
+    <div class="clock" id="clock"></div>
+  </div>
+
+  <div class="content">
+    <div class="top-left"><h2>&nbsp;</h2></div>
+
+    <!-- ===== Tools Grid ===== -->
+    <div class="tools-grid">
+      <!-- ===== MP3 → AAC/M4A Converter Card ===== -->
+      <section id="aac-app" class="card">
+        <div class="h1">MP3 → AAC 変換ツール</div>
+        <p class="p">ファイルはサーバーに送信されません。ブラウザ内で <span class="mono">ffmpeg.wasm</span> が処理します。</p>
+
+        <div id="drop" class="drop" tabindex="0" aria-label="ここにMP3をドラッグ&ドロップ">
+          ここに <strong>MP3</strong> をドロップするか、下の「ファイルを選択」を使用
+        </div>
+
+        <div class="row">
+          <input id="file" class="input" type="file" accept="audio/mpeg,.mp3" />
+          <label>ビットレート：
+            <select id="brate" class="input">
+              <option value="128k">128 kbps（軽量）</option>
+              <option value="160k">160 kbps</option>
+              <option value="192k" selected>192 kbps（バランス）</option>
+              <option value="256k">256 kbps</option>
+              <option value="320k">320 kbps（高音質）</option>
+            </select>
+          </label>
+          <label>出力形式：
+            <select id="format" class="input">
+              <option value="aac" selected>.aac（ADTS）</option>
+              <option value="m4a">.m4a（AAC in MP4／互換性高）</option>
+            </select>
+          </label>
+          <button id="conv" class="btn" disabled>変換する</button>
+          <button id="clear" class="btn ghost" type="button">リセット</button>
+        </div>
+
+        <div id="picked"></div>
+        <div class="prog"><div id="bar" class="bar"></div></div>
+        <div id="log" class="mono" style="white-space:pre-wrap;margin-top:6px;font-size:12px"></div>
+        <div id="out" style="margin-top:12px"></div>
+
+        <footer>初回はエンジン読み込みのため数十MBダウンロードします（初回のみ）</footer>
+      </section>
+
+      <!-- 他のカードを並べる場合は、この右側に増設していける -->
+      
+    </div>
+  </div>
+
+  <div class="footer">
+    &copy; 2025 MURAON WEB. All rights reserved.
+  </div>
+
+  <script>
+    // existing clock
+    function updateClock() {
+      const now = new Date();
+      const h = String(now.getHours()).padStart(2,'0');
+      const m = String(now.getMinutes()).padStart(2,'0');
+      const s = String(now.getSeconds()).padStart(2,'0');
+      document.getElementById('clock').textContent = `${h}:${m}:${s}`;
+    }
+    setInterval(updateClock, 1000); updateClock();
+  </script>
+
+  <!-- ===== ffmpeg.wasm converter logic ===== -->
+  <script type="module">
+    import { FFmpeg } from 'https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/esm/ffmpeg.js';
+    import { fetchFile, toBlobURL } from 'https://unpkg.com/@ffmpeg/util@0.12.2/dist/esm/index.js';
+
+    const $ = (id)=>document.getElementById(id);
+    const fileInput = $('file'), drop = $('drop'), picked = $('picked');
+    const convBtn = $('conv'), clearBtn = $('clear');
+    const brate = $('brate'), formatSel = $('format');
+    const bar = $('bar'), log = $('log'), out = $('out');
+
+    let ffmpeg, currentFile;
+
+    const setProgress = p => bar.style.width = `${Math.max(0,Math.min(100,p*100)).toFixed(1)}%`;
+    const println = s => { log.textContent += s + '\n'; log.scrollTop = log.scrollHeight; };
+
+    function showPicked(file){
+      picked.innerHTML = file ? `<span class="filetag">選択: ${file.name}（${(file.size/1024/1024).toFixed(2)} MB）</span>` : '';
+      convBtn.disabled = !file;
+    }
+    function handleFiles(files){
+      if(!files?.length) return;
+      const f = files[0];
+      if(!/\.mp3$/i.test(f.name) && f.type !== 'audio/mpeg'){ alert('MP3ファイルを選んでください'); return; }
+      currentFile = f; showPicked(f);
+    }
+
+    fileInput.addEventListener('change', e=> handleFiles(e.target.files));
+    ['dragenter','dragover'].forEach(evt=> drop.addEventListener(evt, e=>{ e.preventDefault(); drop.classList.add('drag'); }));
+    ['dragleave','drop'].forEach(evt=> drop.addEventListener(evt, e=>{ e.preventDefault(); drop.classList.remove('drag'); }));
+    drop.addEventListener('drop', e=> handleFiles(e.dataTransfer.files));
+
+    clearBtn.addEventListener('click', ()=>{
+      currentFile=null; fileInput.value=''; showPicked(null); out.innerHTML=''; log.textContent=''; setProgress(0);
+    });
+
+    async function ensureFFmpeg(){
+      if(ffmpeg) return ffmpeg;
+      println('エンジン読込中…（初回のみ数十MB）');
+      ffmpeg = new FFmpeg();
+      ffmpeg.on('log', ({ message }) => println(message));
+      ffmpeg.on('progress', ({ progress }) => setProgress(progress));
+      await ffmpeg.load({
+        coreURL: await toBlobURL('https://unpkg.com/@ffmpeg/core@0.12.6/dist/ffmpeg-core.js','text/javascript'),
+        wasmURL: await toBlobURL('https://unpkg.com/@ffmpeg/core@0.12.6/dist/ffmpeg-core.wasm','application/wasm')
+      });
+      println('準備完了');
+      return ffmpeg;
+    }
+
+    async function convert(){
+      if(!currentFile) return;
+      convBtn.disabled = true; out.innerHTML=''; log.textContent=''; setProgress(0);
+      await ensureFFmpeg();
+      const inputName = 'input.mp3';
+      await ffmpeg.writeFile(inputName, await fetchFile(currentFile));
+      const br = brate.value, mode = formatSel.value;
+      const outName = mode === 'aac' ? 'output.aac' : 'output.m4a';
+      const args = mode === 'aac'
+        ? ['-i', inputName, '-c:a','aac','-b:a', br, '-f','adts', outName]
+        : ['-i', inputName, '-c:a','aac','-b:a', br, '-movflags','faststart', outName];
+      println(`変換開始: ${currentFile.name} → ${outName} / ${br}`);
+      const t0 = performance.now();
+      await ffmpeg.exec(args);
+      const t1 = performance.now();
+      const data = await ffmpeg.readFile(outName);
+      const blob = new Blob([data.buffer], { type: mode==='aac' ? 'audio/aac' : 'audio/mp4' });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement('a');
+      a.href = url; a.download = currentFile.name.replace(/\.[^.]+$/,'') + '.' + mode;
+      a.textContent = `↓ ダウンロード：${a.download}`;
+
+      const audio = document.createElement('audio');
+      audio.src = url; audio.controls = true; audio.style.display='block'; audio.style.marginTop='8px';
+
+      out.replaceChildren(a, audio);
+      println(`完了（${((t1-t0)/1000).toFixed(1)}s）`);
+      convBtn.disabled = false;
+    }
+
+    convBtn.addEventListener('click', convert);
+  </script>
+</body>
+</html>
