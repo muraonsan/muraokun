@@ -1,0 +1,88 @@
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: #f0f2f5;
+    color: #333;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background:#4a69bd;
+    color: white;
+    padding: 15px 20px;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 1.2em;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    height: 65px;
+}
+
+.site-title {
+    font-weight: bold;
+}
+
+.clock {
+    font-size: 1em;
+    white-space: nowrap;
+}
+
+.content {
+  padding-top: 70px;
+  display: flex;
+}
+
+.footer {
+    background: #4a69bd;
+    color: white;
+    text-align: center;
+    padding: 12px 0;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.btn-orange {
+      padding: 3px 10px;
+      font-size: 14px;
+      color: #fff;
+      background: orange;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .btn-orange:active {
+      background: darkorange; /* 押したときだけ濃くなる */
+    }
+
+    /* 上詰め 左寄せ */
+.top-left {
+  display: flex;
+  justify-content: flex-start; /* 横：左寄せ */
+  align-items: flex-start;     /* 縦：上詰め */
+  height: 100%;
+}
+
+/* 上詰め 中央寄せ */
+.top-center {
+  display: flex;
+  justify-content: center;     /* 横：中央寄せ */
+  align-items: flex-start;     /* 縦：上詰め */
+  height: 100%;
+}
+
+/* 上詰め 右寄せ */
+.top-right {
+  display: flex;
+  justify-content: flex-end;   /* 横：右寄せ */
+  align-items: flex-start;     /* 縦：上詰め */
+  height: 100%;
+}
