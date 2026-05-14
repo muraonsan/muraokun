@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MURON WEB</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/script.js"></script>
+</head>
+<body>
+    <header id="common-header">
+        <div class="header-left">
+            <button  onclick="location.href='index.html'">戻る</button>
+        </div>
+        <div class="header-right" id="clock"></div>
+    </header>
+    <!--以下オリジナル。文字寄せ使用する際はcss引用追加せよ-->
+    <main>
+        <h1>📅 保証期限管理</h1>
+  <p>&nbsp;&nbsp;商品名・期限・カテゴリー・メモを入力して登録できます。<br>&nbsp;&nbsp;データが表示されない場合、Supabaseのプロジェクトが一時停止している可能性があります。<br>&nbsp;&nbsp;<a href="https://supabase.com/">こちら</a>にアクセスしプロジェクトを回復してください。</a></p>
+
+  &nbsp;&nbsp;<input type="text" id="name" placeholder="商品名"><br>
+  &nbsp;&nbsp;<input type="date" id="expiry_date">
+  &nbsp;&nbsp;<select id="category">
+    <option value="食品">食品</option>
+    <option value="家電">家電</option>
+   </select>&nbsp;&nbsp;&nbsp;&nbsp;
+  <textarea id="note" placeholder="メモ（任意）"></textarea>&nbsp;&nbsp;
+  <button id="submitBtn">登録</button>
+
+  <h2>&nbsp;&nbsp;登録一覧</h2>
+  <ul id="itemList"></ul>
+
+  <!-- Supabase SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script>
+    const { createClient } = supabase;
+    const supabaseClient = createClient(
+      'https://szawyuurngypoiispviu.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN6YXd5dXVybmd5cG9paXNwdml1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc0NTMyMTYsImV4cCI6MjA2MzAyOTIxNn0.62rwc1HO9FIsbr9YFLLoBiAOnV-b53rT8f3wPF9OTCk'
+    );
+
+    async function addItem() {
+      const name = document.getElementById("name").value;
+      const expiry = document.getElementById("expiry_date").value;
+      const category = document.getElementById("category").value;
+      const note = document.getElementById("note").value;
+
+      if (!name || !expiry) {
+        alert("商品名と期限は必須です。");
+        return;
+      }
+
+      const { error } = await supabaseClient.from("items").insert([
+        { name, expiry_date: expiry, category, note }
+      ]);
+
+      if (error) {
+        alert("登録に失敗しました: " + error.message);
+        return;
+      }
+
+      fetchItems();
+    }
+
+    async function fetchItems() {
+  const { data, error } = await supabaseClient
+    .from("items")
+    .select("*")
+    .order("expiry_date", { ascending: true });
+
+  if (error || !data) {
+    console.error("データ取得エラー:", error);
+    return;
+  }
+
+  console.log("取得したデータ:", data); // ←追加
+
+  const list = document.getElementById("itemList");
+  list.innerHTML = "";
+
+  const today = new Date();
+  data.forEach(item => {
+  const daysLeft = Math.ceil((new Date(item.expiry_date) - today) / (1000 * 60 * 60 * 24));
+  const li = document.createElement("li");
+  li.innerHTML = `
+  <strong>${item.name}</strong> - ${item.expiry_date}（残り${daysLeft}日）<br>
+  🗂️ カテゴリー: ${item.category}<br>
+  📝 メモ: ${item.note}
+`;
+
+  // 色分け
+  if (daysLeft <= 3) li.style.color = "red";
+  else if (daysLeft <= 7) li.style.color = "orange";
+
+  // 🗑️ 削除ボタン
+  const delBtn = document.createElement("button");
+  delBtn.textContent = "削除";
+  delBtn.style.marginLeft = "10px";
+  delBtn.onclick = () => deleteItem(item.id);
+  li.appendChild(delBtn);
+
+  list.appendChild(li);
+});
+}
+
+
+    // ページ読み込み時に登録
+    document.addEventListener("DOMContentLoaded", () => {
+      fetchItems();
+      document.getElementById("submitBtn").addEventListener("click", addItem);
+    });
+  </script>
+        </main>
+    <script>
+        window.onload = function() {
+            loadCommonHeader();
+            updateClock();
+            setInterval(updateClock, 1000);
+        };
+
+        //削除関連の関数
+        async function deleteItem(id) {
+  const confirmed = confirm("本当に削除しますか？");
+  if (!confirmed) return;
+
+  const { error } = await supabaseClient
+    .from("items")
+    .delete()
+    .eq("id", id);
+
+  if (error) {
+    alert("削除に失敗しました: " + error.message);
+    return;
+  }
+
+  fetchItems(); // 再読み込み
+}
+    </script>
+
+    <!--ipad用のアニメーションん-->
+<script>
+  document.querySelectorAll('.macro-button').forEach(button => {
+  button.addEventListener('touchstart', () => {
+    button.classList.add('active-touch');
+  });
+  button.addEventListener('touchend', () => {
+    button.classList.remove('active-touch');
+  });
+});
+</script>
+
+</body>
+</html>

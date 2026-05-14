@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MURON WEB</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/moji.css">
+    <script src="js/script.js"></script>
+</head>
+
+<style>
+    main { font-family: sans-serif; padding: 20px; }
+    input, button { margin: 5px 0; }
+    img { margin-top: 5px; border: 1px solid #ccc; border-radius: 4px; }
+</style>
+
+
+<body>
+    <header id="common-header">
+        <div class="header-left">
+            <button onclick="location.href='index.html'">ダッシュボードに戻る</button>
+        </div>
+        <div class="header-right" id="clock"></div>
+    </header>
+    <!--以下オリジナル。文字寄せ使用する際はcss引用追加せよ-->
+    <main>
+        <h2>&nbsp;&nbsp;&nbsp;村音WEB&nbsp;&nbsp;簡易掲示板システム</h2>
+        <p style="font-size: 15px;">&nbsp;&nbsp;このシステムは仮設です。<br>&nbsp;&nbsp;外部サービスを使用しているので個人名等記載のあるものはアップロードしないでください。</p>
+        <p style="font-size: 15px;">&nbsp;&nbsp;PDFファイル名に日本語・記号があるとアップロードエラーが発生します。</p><br>
+        <button onclick="location.reload()">再読み込み</button><br>
+
+
+        <!--ここから掲示板-->
+        <input type="text" id="name" placeholder="名前">
+  <input type="text" id="message" placeholder="メッセージ">
+  <input type="file" id="fileInput">
+  <button id="postButton">投稿</button>
+
+  <h2>📝 投稿一覧</h2>
+  <ul id="messages"></ul>
+
+  <!-- Supabaseライブラリの読み込み -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
+  <!-- 掲示板のスクリプト -->
+  <script>
+    // Supabase初期化（↓あなたの情報に置き換えてください）
+    const { createClient } = supabase;
+    const supabaseClient = createClient(
+      'https://szawyuurngypoiispviu.supabase.co',      // ← あなたのProject URL
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN6YXd5dXVybmd5cG9paXNwdml1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc0NTMyMTYsImV4cCI6MjA2MzAyOTIxNn0.62rwc1HO9FIsbr9YFLLoBiAOnV-b53rT8f3wPF9OTCk'                      // ← あなたのanon公開キー
+    );
+
+    // 投稿表示関数
+    function renderMessage(m) {
+      const li = document.createElement("li");
+      li.textContent = `${m.name}: ${m.message} (${new Date(m.created_at).toLocaleString()})`;
+
+      if (m.file_url) {
+        const img = document.createElement("img");
+        img.src = m.file_url;
+        li.appendChild(document.createElement("br"));
+        li.appendChild(img);
+      }
+
+      return li;
+    }
+
+    // 投稿処理
+    async function postMessage() {
+      const name = document.getElementById("name").value.trim();
+      const msg = document.getElementById("message").value.trim();
+      const file = document.getElementById("fileInput").files[0];
+      let fileUrl = null;
+
+      if (!name || !msg) {
+        alert("名前とメッセージを入力してください！");
+        return;
+      }
+
+      if (file) {
+        const filePath = `${Date.now()}_${file.name}`;
+        const { error: uploadError } = await supabaseClient
+          .storage
+          .from('attachments')
+          .upload(filePath, file);
+
+        if (uploadError) {
+          alert("ファイルのアップロードに失敗しました: " + uploadError.message);
+          return;
+        }
+
+        const { data: publicUrlData } = supabaseClient
+          .storage
+          .from('attachments')
+          .getPublicUrl(filePath);
+
+        fileUrl = publicUrlData.publicUrl;
+      }
+
+      await supabaseClient.from("messages").insert([{
+        name: name,
+        message: msg,
+        file_url: fileUrl
+      }]);
+
+      document.getElementById("message").value = "";
+      document.getElementById("fileInput").value = "";
+    }
+
+    // 投稿一覧取得
+    async function fetchMessages() {
+  const { data, error } = await supabaseClient
+    .from("messages")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (!data) {
+    console.error("投稿の取得に失敗:", error);
+    return;
+  }
+
+  const ul = document.getElementById("messages");
+  ul.innerHTML = "";
+  data.forEach(m => {
+    ul.appendChild(renderMessage(m));
+  });
+}
+
+//削除機能
+function renderMessage(m) {
+  const li = document.createElement("li");
+  li.setAttribute("data-id", m.id); // 投稿IDを保持
+  li.textContent = `${m.name}: ${m.message} (${new Date(m.created_at).toLocaleString()})`;
+
+  if (m.file_url) {
+  const url = m.file_url;
+  const ext = url.split('.').pop().toLowerCase();
+
+  if (ext === 'pdf') {
+    const a = document.createElement("a");
+    a.href = url;
+    a.textContent = "📄 PDFを開く";
+    a.target = "_blank";
+    li.appendChild(document.createElement("br"));
+    li.appendChild(a);
+  } else {
+    const img = document.createElement("img");
+    img.src = url;
+    li.appendChild(document.createElement("br"));
+    li.appendChild(img);
+  }
+}
+  // 🗑️ 削除ボタン追加
+  const delBtn = document.createElement("button");
+  delBtn.textContent = "削除";
+  delBtn.style.marginLeft = "1em";
+  delBtn.onclick = () => deleteMessage(m.id, li);
+  li.appendChild(delBtn);
+
+  return li;
+}
+
+//削除機能の関数
+async function deleteMessage(id, element) {
+  const confirmed = confirm("この投稿を削除しますか？");
+  if (!confirmed) return;
+
+  const { error } = await supabaseClient
+    .from("messages")
+    .delete()
+    .eq("id", id);
+
+  if (error) {
+    alert("削除に失敗しました：" + error.message);
+  } else {
+    element.remove(); // DOMからも消す
+  }
+}
+
+
+    // 初期表示
+    document.addEventListener("DOMContentLoaded", () => {
+      fetchMessages();
+
+      document.getElementById("postButton").addEventListener("click", postMessage);
+
+      // リアルタイム購読
+      supabaseClient
+        .channel('public:messages')
+        .on(
+          'postgres_changes',
+          { event: 'INSERT', schema: 'public', table: 'messages' },
+          payload => {
+            const m = payload.new;
+            document.getElementById("messages").prepend(renderMessage(m));
+          }
+        )
+        .subscribe();
+    });
+  </script>
+
+</body>
+</html>

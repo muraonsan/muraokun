@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MURON WEB</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/moji.css">
+    <script src="js/script.js"></script>
+</head>
+<body>
+    <header id="common-header">
+        <div class="header-left">
+            <button class="back-button" onclick="location.href='index.html'">戻る</button>
+        </div>
+        <div class="header-right" id="clock"></div>
+    </header>
+    <!--以下オリジナル。文字寄せ使用する際はcss引用追加せよ-->
+    <main>
+
+      <div class="moji-senta">
+        <h1>◇ 音源操作 ◇</h1>
+      
+
+        <button class="macro-button" id="longPlayBtn">乗降案内（長）</button>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <button class="macro-button" id="shortPlayBtn">乗降案内（短）</button>
+
+      </div>
+      
+        <script>
+          const loopAudio = new Audio('music/1.mp3');  // ループ再生用
+          loopAudio.loop = true;
+      
+          const singleAudio = new Audio('music/tobi.mp3');  // 単発再生用
+      
+          const longPlayBtn = document.getElementById('longPlayBtn');
+          const shortPlayBtn = document.getElementById('shortPlayBtn');
+      
+          let isLoopPlaying = false;
+      
+          longPlayBtn.addEventListener('click', () => {
+            if (!isLoopPlaying) {
+              // ON状態にする
+              loopAudio.currentTime = 0;
+              loopAudio.play();
+              longPlayBtn.classList.add('on');
+              isLoopPlaying = true;
+            } else {
+              // OFFにして単発音を再生
+              loopAudio.pause();
+              loopAudio.currentTime = 0;
+              longPlayBtn.classList.remove('on');
+              isLoopPlaying = false;
+      
+              singleAudio.currentTime = 0;
+              singleAudio.play();
+            }
+          });
+      
+          shortPlayBtn.addEventListener('click', () => {
+            singleAudio.currentTime = 0;
+            singleAudio.play();
+          });
+        </script>
+
+        </main>
+    <script>
+        window.onload = function() {
+            loadCommonHeader();
+            updateClock();
+            setInterval(updateClock, 1000);
+        };
+    </script>
+
+    <!--ipad用のアニメーションん-->
+<script>
+  document.querySelectorAll('.macro-button').forEach(button => {
+  button.addEventListener('touchstart', () => {
+    button.classList.add('active-touch');
+  });
+  button.addEventListener('touchend', () => {
+    button.classList.remove('active-touch');
+  });
+});
+</script>
+
+</body>
+</html>
